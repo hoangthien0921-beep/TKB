@@ -289,6 +289,44 @@
         font-size: 16px;
       }
     }
+    @media (max-width: 600px) {
+
+  .container {
+    padding: 12px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  table {
+    min-width: 700px;
+  }
+
+  td {
+    height: 90px;
+    font-size: 11px;
+  }
+
+  .lesson {
+    padding: 6px;
+    font-size: 11px;
+  }
+
+  .main-btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  img {
+    max-width: 100%;
+  }
+}
   </style>
 </head>
 <body>
@@ -315,6 +353,9 @@
       <button class="main-btn" id="addRowBtn">
         ➕ Thêm khung giờ
       </button>
+      <button class="main-btn" id="downloadPdfBtn">
+  📄 Xuất PDF
+</button>
     </div>
 
     <div class="table-wrapper">
@@ -389,9 +430,29 @@
         const lesson = document.createElement('div');
         lesson.className = 'lesson';
         lesson.dataset.name = name;
+        lesson.dataset.photo =
+  auth.currentUser.photoURL || '';
         lesson.style.background = getColorFromName(name);
-        lesson.innerHTML = `<strong>👤 ${name}</strong>`;
+        lesson.innerHTML = `
+  <div style="
+    display:flex;
+    align-items:center;
+    gap:8px;
+    justify-content:center;
+  ">
+    <img
+      src="${auth.currentUser.photoURL}"
+      width="28"
+      height="28"
+      style="
+        border-radius:50%;
+        border:2px solid white;
+      "
+    />
 
+    <strong>${name}</strong>
+  </div>
+`;
         lesson.addEventListener('click', (event) => {
           event.stopPropagation();
 
@@ -666,7 +727,8 @@ async function initFirebase() {
 
         const lessons = [...row.querySelectorAll('td')].map(cell => {
           return [...cell.querySelectorAll('.lesson')].map(item => ({
-            name: item.dataset.name
+            name: item.dataset.name,
+photo: item.dataset.photo
           }));
         });
 
@@ -720,8 +782,28 @@ async function initFirebase() {
               const lesson = document.createElement('div');
               lesson.className = 'lesson';
               lesson.dataset.name = user.name;
+              lesson.dataset.photo = user.photo || '';
               lesson.style.background = getColorFromName(user.name);
-              lesson.innerHTML = `<strong>👤 ${user.name}</strong>`;
+              lesson.innerHTML = `
+  <div style="
+    display:flex;
+    align-items:center;
+    gap:8px;
+    justify-content:center;
+  ">
+    <img
+      src="${user.photo}"
+      width="28"
+      height="28"
+      style="
+        border-radius:50%;
+        border:2px solid white;
+      "
+    />
+
+    <strong>${user.name}</strong>
+  </div>
+`;
 
               lesson.addEventListener('click', (event) => {
           event.stopPropagation();
@@ -779,6 +861,34 @@ async function initFirebase() {
     console.assert(typeof updatePopularCells === 'function', 'updatePopularCells should exist');
     console.assert(document.getElementById('scheduleBody'), 'scheduleBody should exist');
     console.assert(Array.isArray(userColors), 'userColors should be array');
+    document
+  .getElementById('downloadPdfBtn')
+  .addEventListener('click', () => {
+
+    const element =
+      document.querySelector('.container');
+
+    html2pdf()
+      .set({
+        margin: 0.5,
+        filename: 'TKB-Toan.pdf',
+        image: {
+          type: 'jpeg',
+          quality: 1
+        },
+        html2canvas: {
+          scale: 2
+        },
+        jsPDF: {
+          unit: 'in',
+          format: 'a4',
+          orientation: 'landscape'
+        }
+      })
+      .from(element)
+      .save();
+});
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 </html>
