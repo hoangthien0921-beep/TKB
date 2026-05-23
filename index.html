@@ -441,7 +441,7 @@
     justify-content:center;
   ">
     <img
-      src="${auth.currentUser.photoURL}"
+      src="${auth.currentUser.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
       width="28"
       height="28"
       style="
@@ -782,8 +782,9 @@ photo: item.dataset.photo
               const lesson = document.createElement('div');
               lesson.className = 'lesson';
               lesson.dataset.name = user.name;
-              lesson.dataset.photo = user.photo || '';
-              lesson.style.background = getColorFromName(user.name);
+              lesson.dataset.photo =
+  auth.currentUser.photoURL ||
+  'https://cdn-icons-png.flaticon.com/512/149/149071.png';
               lesson.innerHTML = `
   <div style="
     display:flex;
@@ -792,7 +793,7 @@ photo: item.dataset.photo
     justify-content:center;
   ">
     <img
-      src="${user.photo}"
+      src="${user.photo || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
       width="28"
       height="28"
       style="
