@@ -304,7 +304,13 @@
     </div>
 
     <input type="text" id="name" placeholder="Nhập tên của bạn" />
-
+    <button id="loginBtn" class="main-btn">
+  🔑 Đăng nhập Google
+</button>
+    <button id="logoutBtn" class="main-btn">
+  🚪 Đăng xuất
+</button>
+<div id="userBox"></div>
     <div class="top-bar">
       <button class="main-btn" id="addRowBtn">
         ➕ Thêm khung giờ
@@ -358,6 +364,10 @@
       const td = document.createElement('td');
 
       td.addEventListener('click', () => {
+        if (!auth.currentUser) {
+  alert("Hãy đăng nhập!");
+  return;
+}
         const nameInput = document.getElementById('name');
         const name = nameInput.value.trim();
 
@@ -525,7 +535,76 @@
 
       firebase.initializeApp(firebaseConfig);
       database = firebase.database();
+      const auth = firebase.auth();
 
+const provider = new firebase.auth.GoogleAuthProvider();
+
+document
+  .getElementById('loginBtn')
+  .addEventListener('click', async () => {
+
+    try {
+      await auth.signInWithPopup(provider);
+    } catch (err) {
+      console.error(err);
+      alert('Đăng nhập thất bại!');
+    }
+});
+
+auth.onAuthStateChanged(user => {
+
+  if (!user) return;
+
+  // Tự điền tên
+  document.getElementById('name').value =
+    user.displayName;
+
+  // Hiển thị user
+  document.getElementById('userBox').innerHTML = `
+    <div style="
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:20px;
+      background:rgba(255,255,255,0.08);
+      padding:10px 14px;
+      border-radius:14px;
+    ">
+      <img
+        src="${user.photoURL}"
+        width="42"
+        height="42"
+        style="
+          border-radius:50%;
+          border:2px solid white;
+        "
+      />
+
+      <div>
+        <div style="font-weight:bold">
+          ${user.displayName}
+        </div>
+
+        <div style="
+          font-size:12px;
+          opacity:0.7;
+        ">
+          ${user.email}
+        </div>
+      </div>
+    </div>
+  `;
+});
+      document
+  .getElementById('logoutBtn')
+  .addEventListener('click', async () => {
+
+    await auth.signOut();
+
+    document.getElementById('userBox').innerHTML = '';
+
+    document.getElementById('name').value = '';
+});
       startRealtimeSync();
     }
 
@@ -679,5 +758,6 @@
     console.assert(document.getElementById('scheduleBody'), 'scheduleBody should exist');
     console.assert(Array.isArray(userColors), 'userColors should be array');
   </script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 </body>
 </html>
