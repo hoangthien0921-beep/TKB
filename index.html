@@ -137,9 +137,10 @@
     }
 
     table {
-      width: max-content;
+      width: 100%;
       min-width: 900px;
       border-collapse: collapse;
+      table-layout: fixed;
     }
 
     thead th {
@@ -164,6 +165,8 @@
       vertical-align: top;
       cursor: pointer;
       transition: 0.3s;
+      overflow: hidden;
+word-break: break-word;
     }
 
     td:hover {
@@ -181,6 +184,8 @@
       color: white;
       font-weight: 600;
       margin-bottom: 8px;
+      width: 100%;
+overflow: hidden;
     }
 
     .lesson:hover {
@@ -439,7 +444,7 @@
     display:flex;
     align-items:center;
     gap:8px;
-    justify-content:center;
+    justify-content:flex-start;
   ">
     <img
       src="${auth.currentUser.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
@@ -451,7 +456,13 @@
       "
     />
 
-    <strong>${name}</strong>
+    <strong style="
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+">
+  ${name}
+</strong>
   </div>
 `;
         lesson.addEventListener('click', (event) => {
@@ -791,7 +802,7 @@ photo: item.dataset.photo
     display:flex;
     align-items:center;
     gap:8px;
-    justify-content:center;
+    justify-content:flex-start;
   ">
     <img
       src="${user.photo || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
