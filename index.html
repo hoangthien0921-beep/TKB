@@ -111,20 +111,30 @@
 
     td:hover {
       background: rgba(255,255,255,0.12);
+      transform: scale(1.015);
     }
 
     .lesson {
-      background: linear-gradient(135deg,rgba(139,92,246,0.95),rgba(99,102,241,0.95));
       padding: 10px;
       border-radius: 12px;
       text-align: center;
       animation: fadeIn 0.25s ease;
+      transition: 0.25s;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+      color: white;
+      font-weight: 600;
+    }
+
+    .lesson:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 10px 25px rgba(139,92,246,0.45);
     }
 
     .popular-cell {
       background: rgba(250,204,21,0.2) !important;
       border: 2px solid rgba(250,204,21,0.8) !important;
       box-shadow: 0 0 18px rgba(250,204,21,0.55);
+      animation: glowPulse 1.8s infinite;
     }
 
     .remove-row-btn {
@@ -144,6 +154,22 @@
       display: flex;
       justify-content: center;
       margin-bottom: 20px;
+    }
+
+    @keyframes glowPulse {
+      0% {
+        box-shadow: 0 0 10px rgba(250,204,21,0.35);
+      }
+
+      50% {
+        box-shadow:
+          0 0 22px rgba(250,204,21,0.95),
+          0 0 40px rgba(250,204,21,0.55);
+      }
+
+      100% {
+        box-shadow: 0 0 10px rgba(250,204,21,0.35);
+      }
     }
 
     @keyframes fadeIn {
@@ -228,6 +254,26 @@
       saveLocal();
     }
 
+    const userColors = [
+      'linear-gradient(135deg,#ec4899,#be185d)',
+      'linear-gradient(135deg,#8b5cf6,#6366f1)',
+      'linear-gradient(135deg,#06b6d4,#2563eb)',
+      'linear-gradient(135deg,#22c55e,#15803d)',
+      'linear-gradient(135deg,#f59e0b,#ea580c)',
+      'linear-gradient(135deg,#ef4444,#b91c1c)',
+      'linear-gradient(135deg,#14b8a6,#0f766e)'
+    ];
+
+    function getColorFromName(name) {
+      let total = 0;
+
+      for (let i = 0; i < name.length; i++) {
+        total += name.charCodeAt(i);
+      }
+
+      return userColors[total % userColors.length];
+    }
+
     function setupCells() {
       const cells = document.querySelectorAll('td');
 
@@ -258,7 +304,11 @@
           const lesson = document.createElement('div');
           lesson.className = 'lesson';
           lesson.dataset.name = name;
-          lesson.innerHTML = `<strong>👤 ${name}</strong>`;
+          lesson.style.background = getColorFromName(name);
+
+          lesson.innerHTML = `
+            <strong>👤 ${name}</strong>
+          `;
 
           cell.appendChild(lesson);
 
