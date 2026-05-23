@@ -514,6 +514,7 @@
 };
 
     let database = null;
+let auth = null;
 
     async function initFirebase() {
       // Load Firebase động
@@ -535,21 +536,18 @@
 
       firebase.initializeApp(firebaseConfig);
       database = firebase.database();
-      const auth = firebase.auth();
+      auth = firebase.auth();
 
 const provider = new firebase.auth.GoogleAuthProvider();
 
-document
-  .getElementById('loginBtn')
-  .addEventListener('click', async () => {
-
-    try {
-      await auth.signInWithPopup(provider);
-    } catch (err) {
-      console.error(err);
-      alert('Đăng nhập thất bại!');
-    }
-});
+document.getElementById('loginBtn').onclick = async () => {
+  try {
+    await auth.signInWithPopup(provider);
+  } catch (err) {
+    console.error(err);
+    alert('Đăng nhập thất bại!');
+  }
+};
 
 auth.onAuthStateChanged(user => {
 
@@ -595,16 +593,14 @@ auth.onAuthStateChanged(user => {
     </div>
   `;
 });
-      document
-  .getElementById('logoutBtn')
-  .addEventListener('click', async () => {
+document.getElementById('logoutBtn').onclick = async () => {
 
-    await auth.signOut();
+  await auth.signOut();
 
-    document.getElementById('userBox').innerHTML = '';
+  document.getElementById('userBox').innerHTML = '';
 
-    document.getElementById('name').value = '';
-});
+  document.getElementById('name').value = '';
+};
       startRealtimeSync();
     }
 
