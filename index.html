@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thời Khóa Biểu Học Toán</title>
+  <title>Math Schedule</title>
+
   <style>
     * {
       margin: 0;
@@ -19,174 +20,130 @@
       justify-content: center;
       align-items: center;
       padding: 30px;
-      overflow-x: auto;
+      color: white;
     }
 
     .container {
       width: 100%;
       max-width: 1200px;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255,255,255,0.08);
       backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.15);
       border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.15);
       padding: 35px;
       box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-      color: white;
     }
 
     h1 {
       text-align: center;
       font-size: 42px;
       margin-bottom: 10px;
-      background: linear-gradient(90deg, #c4b5fd, #ffffff);
+      background: linear-gradient(90deg,#c4b5fd,#ffffff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      font-weight: 800;
-      letter-spacing: 1px;
     }
 
     .subtitle {
       text-align: center;
-      margin-bottom: 30px;
       color: #cbd5e1;
-      font-size: 16px;
+      margin-bottom: 25px;
     }
 
-    .form-box {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 30px;
-    }
-
-    input, select {
+    input {
+      width: 100%;
       padding: 14px;
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.15);
       background: rgba(255,255,255,0.08);
       color: white;
-      font-size: 15px;
+      margin-bottom: 20px;
       outline: none;
-      transition: 0.3s;
     }
 
     input::placeholder {
       color: #cbd5e1;
     }
 
-    input:focus,
-    select:focus {
-      border-color: #a78bfa;
-      background: rgba(255,255,255,0.12);
-      box-shadow: 0 0 10px rgba(167,139,250,0.5);
-    }
-
-    select option {
-      color: black;
-    }
-
     button {
       border: none;
-      border-radius: 14px;
-      padding: 14px;
-      font-size: 15px;
-      font-weight: bold;
+      border-radius: 12px;
       cursor: pointer;
       transition: 0.3s;
     }
 
     .main-btn {
-      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      background: linear-gradient(135deg,#8b5cf6,#6366f1);
       color: white;
-      box-shadow: 0 5px 15px rgba(99,102,241,0.4);
+      padding: 12px 18px;
+      font-weight: bold;
+      margin-bottom: 25px;
     }
 
     .main-btn:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 8px 20px rgba(99,102,241,0.6);
+      transform: scale(1.03);
     }
 
     .table-wrapper {
       overflow-x: auto;
-      border-radius: 20px;
     }
 
     table {
       width: 100%;
-      border-collapse: collapse;
-      overflow: hidden;
-      border-radius: 20px;
       min-width: 900px;
+      border-collapse: collapse;
     }
 
     th {
       background: rgba(99,102,241,0.35);
-      color: white;
-      padding: 18px;
-      font-size: 16px;
-      backdrop-filter: blur(10px);
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
     td {
-      background: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.08);
-      padding: 12px;
-      vertical-align: top;
-      min-height: 120px;
       height: 120px;
+      padding: 10px;
+      vertical-align: top;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    td:hover {
+      background: rgba(255,255,255,0.12);
     }
 
     .lesson {
-      background: linear-gradient(135deg, rgba(139,92,246,0.9), rgba(99,102,241,0.9));
-      border-radius: 16px;
-      padding: 12px;
-      margin-bottom: 10px;
-      color: white;
-      animation: fadeIn 0.4s ease;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+      background: linear-gradient(135deg,rgba(139,92,246,0.95),rgba(99,102,241,0.95));
+      padding: 10px;
+      border-radius: 12px;
+      text-align: center;
+      animation: fadeIn 0.25s ease;
     }
 
-    .lesson strong {
-      font-size: 15px;
-    }
-
-    .lesson p {
-      margin-top: 6px;
-      font-size: 14px;
-      color: #e0e7ff;
-    }
-
-    .delete-btn {
-      margin-top: 10px;
-      background: rgba(255,255,255,0.15);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.2);
-      padding: 7px 12px;
-      border-radius: 10px;
-      font-size: 12px;
-    }
-
-    .delete-btn:hover {
-      background: rgba(239,68,68,0.9);
+    .popular-cell {
+      background: rgba(250,204,21,0.2) !important;
+      border: 2px solid rgba(250,204,21,0.8) !important;
+      box-shadow: 0 0 18px rgba(250,204,21,0.55);
     }
 
     .remove-row-btn {
-      background: rgba(239,68,68,0.85);
-      border: none;
-      color: white;
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      cursor: pointer;
+      background: rgba(239,68,68,0.9);
+      color: white;
       font-size: 14px;
-      transition: 0.3s;
-      flex-shrink: 0;
     }
 
     .remove-row-btn:hover {
       transform: scale(1.1);
-      background: rgb(220,38,38);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
     }
 
     @keyframes fadeIn {
@@ -194,23 +151,10 @@
         opacity: 0;
         transform: translateY(10px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        padding: 20px;
-      }
-
-      h1 {
-        font-size: 30px;
-      }
-
-      .form-box {
-        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -218,105 +162,55 @@
 <body>
   <div class="container">
     <h1>📘 Math Schedule</h1>
-    <div class="subtitle">Hệ thống đăng ký thời khóa biểu học Toán hiện đại</div>
 
-    <div class="form-box">
-      <input type="text" id="name" placeholder="Nhập tên của bạn" />
+    <div class="subtitle">
+      Nhiều người có thể cùng đăng ký lịch học ✨
     </div>
 
-    <div style="margin-bottom: 20px; color: #cbd5e1; text-align:center;">
-      👉 Bấm trực tiếp vào ô để đăng ký lịch học. Có thể tự sửa hoặc thêm khung giờ.
-    </div>
+    <input type="text" id="name" placeholder="Nhập tên của bạn" />
 
-    <div style="display:flex; justify-content:center; margin-bottom:25px;">
-      <button class="main-btn" onclick="addTimeRow()">➕ Thêm khung giờ</button>
+    <div class="top-bar">
+      <button class="main-btn" onclick="addTimeRow()">
+        ➕ Thêm khung giờ
+      </button>
     </div>
 
     <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>⏰ Thời gian</th>
-          <th>Thứ 2</th>
-          <th>Thứ 3</th>
-          <th>Thứ 4</th>
-          <th>Thứ 5</th>
-          <th>Thứ 6</th>
-          <th>Thứ 7</th>
-          <th>Chủ nhật</th>
-        </tr>
-      </thead>
-      <tbody id="scheduleBody">
-        <tr>
-          <th>
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-              <span contenteditable="true" style="outline:none; width:100%;">19:00 - 21:00</span>
-              <button class="remove-row-btn">✖</button>
-            </div>
-          </th>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
+      <table>
+        <thead>
+          <tr>
+            <th>⏰ Thời gian</th>
+            <th>Thứ 2</th>
+            <th>Thứ 3</th>
+            <th>Thứ 4</th>
+            <th>Thứ 5</th>
+            <th>Thứ 6</th>
+            <th>Thứ 7</th>
+            <th>Chủ nhật</th>
+          </tr>
+        </thead>
+
+        <tbody id="scheduleBody"></tbody>
+      </table>
     </div>
   </div>
 
   <script>
-    function setupCells() {
-      const cells = document.querySelectorAll('td');
+    const scheduleBody = document.getElementById('scheduleBody');
 
-      cells.forEach(cell => {
-        if (cell.dataset.active) return;
-
-        cell.dataset.active = 'true';
-        cell.style.cursor = 'pointer';
-
-        cell.addEventListener('click', () => {
-          const existingLesson = cell.querySelector('.lesson');
-
-          // Bấm lần 2 để xóa
-          if (existingLesson) {
-            existingLesson.remove();
-            return;
-          }
-
-          const name = document.getElementById('name').value.trim();
-
-          if (!name) {
-            alert('Vui lòng nhập tên trước!');
-            return;
-          }
-
-          const lesson = document.createElement('div');
-          lesson.className = 'lesson';
-
-          lesson.innerHTML = `
-            <strong>👤 ${name}</strong>
-          `;
-
-          cell.appendChild(lesson);
-        });
-      });
-    }
-
-    function addTimeRow() {
-      const tbody = document.getElementById('scheduleBody');
-
+    function createRow(time = '19:00 - 21:00') {
       const row = document.createElement('tr');
 
       row.innerHTML = `
         <th>
           <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-            <span contenteditable="true" style="outline:none; width:100%;">Nhập giờ học</span>
+            <span contenteditable="true" style="outline:none; width:100%; text-align:left;">
+              ${time}
+            </span>
             <button class="remove-row-btn">✖</button>
           </div>
         </th>
+
         <td></td>
         <td></td>
         <td></td>
@@ -326,33 +220,136 @@
         <td></td>
       `;
 
-      tbody.appendChild(row);
+      scheduleBody.appendChild(row);
+
       setupCells();
       setupRemoveButtons();
+      updatePopularCells();
+      saveLocal();
+    }
+
+    function setupCells() {
+      const cells = document.querySelectorAll('td');
+
+      cells.forEach(cell => {
+        if (cell.dataset.ready) return;
+
+        cell.dataset.ready = 'true';
+
+        cell.addEventListener('click', () => {
+          const name = document.getElementById('name').value.trim();
+
+          if (!name) {
+            alert('Vui lòng nhập tên trước!');
+            return;
+          }
+
+          const existing = [...cell.querySelectorAll('.lesson')]
+            .find(item => item.dataset.name === name);
+
+          // Nếu tên đã tồn tại thì xóa
+          if (existing) {
+            existing.remove();
+            updatePopularCells();
+            saveLocal();
+            return;
+          }
+
+          const lesson = document.createElement('div');
+          lesson.className = 'lesson';
+          lesson.dataset.name = name;
+          lesson.innerHTML = `<strong>👤 ${name}</strong>`;
+
+          cell.appendChild(lesson);
+
+          updatePopularCells();
+          saveLocal();
+        });
+      });
     }
 
     function setupRemoveButtons() {
       const buttons = document.querySelectorAll('.remove-row-btn');
 
       buttons.forEach(button => {
-        if (button.dataset.active) return;
+        if (button.dataset.ready) return;
 
-        button.dataset.active = 'true';
+        button.dataset.ready = 'true';
 
-        button.onclick = (e) => {
+        button.addEventListener('click', (e) => {
           e.stopPropagation();
 
           const row = button.closest('tr');
 
           if (confirm('Bạn có muốn xóa khung giờ này không?')) {
             row.remove();
+            updatePopularCells();
+            saveLocal();
           }
-        };
+        });
       });
     }
 
-    setupCells();
-    setupRemoveButtons();
+    function updatePopularCells() {
+      const rows = document.querySelectorAll('#scheduleBody tr');
+
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+
+        let max = 0;
+
+        cells.forEach(cell => {
+          cell.classList.remove('popular-cell');
+
+          const count = cell.querySelectorAll('.lesson').length;
+
+          if (count > max) {
+            max = count;
+          }
+        });
+
+        if (max === 0) return;
+
+        cells.forEach(cell => {
+          const count = cell.querySelectorAll('.lesson').length;
+
+          if (count === max) {
+            cell.classList.add('popular-cell');
+          }
+        });
+      });
+    }
+
+    function addTimeRow() {
+      createRow('Nhập giờ học');
+    }
+
+    // Lưu local
+    function saveLocal() {
+      localStorage.setItem('mathSchedule', scheduleBody.innerHTML);
+    }
+
+    function loadLocal() {
+      const saved = localStorage.getItem('mathSchedule');
+
+      if (saved) {
+        scheduleBody.innerHTML = saved;
+      } else {
+        createRow();
+      }
+
+      setupCells();
+      setupRemoveButtons();
+      updatePopularCells();
+    }
+
+    loadLocal();
+
+    // Tests
+    console.assert(typeof createRow === 'function', 'createRow should exist');
+    console.assert(typeof setupCells === 'function', 'setupCells should exist');
+    console.assert(typeof updatePopularCells === 'function', 'updatePopularCells should exist');
+    console.assert(document.getElementById('scheduleBody'), 'scheduleBody should exist');
   </script>
 </body>
 </html>
