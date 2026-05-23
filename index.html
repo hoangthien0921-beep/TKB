@@ -171,6 +171,24 @@
       background: rgba(239,68,68,0.9);
     }
 
+    .remove-row-btn {
+      background: rgba(239,68,68,0.85);
+      border: none;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.3s;
+      flex-shrink: 0;
+    }
+
+    .remove-row-btn:hover {
+      transform: scale(1.1);
+      background: rgb(220,38,38);
+    }
+
     @keyframes fadeIn {
       from {
         opacity: 0;
@@ -203,34 +221,22 @@
     <div class="subtitle">Hệ thống đăng ký thời khóa biểu học Toán hiện đại</div>
 
     <div class="form-box">
-      <input type="text" id="name" placeholder="Tên học sinh" />
+      <input type="text" id="name" placeholder="Nhập tên của bạn" />
+    </div>
 
-      <select id="day">
-        <option value="Thứ 2">Thứ 2</option>
-        <option value="Thứ 3">Thứ 3</option>
-        <option value="Thứ 4">Thứ 4</option>
-        <option value="Thứ 5">Thứ 5</option>
-        <option value="Thứ 6">Thứ 6</option>
-        <option value="Thứ 7">Thứ 7</option>
-        <option value="Chủ nhật">Chủ nhật</option>
-      </select>
+    <div style="margin-bottom: 20px; color: #cbd5e1; text-align:center;">
+      👉 Bấm trực tiếp vào ô để đăng ký lịch học. Có thể tự sửa hoặc thêm khung giờ.
+    </div>
 
-      <select id="time">
-        <option value="Sáng">Sáng</option>
-        <option value="Chiều">Chiều</option>
-        <option value="Tối">Tối</option>
-      </select>
-
-      <input type="text" id="topic" placeholder="Nội dung học Toán" />
-
-      <button class="main-btn" onclick="addSchedule()">✨ Thêm vào thời khóa biểu</button>
+    <div style="display:flex; justify-content:center; margin-bottom:25px;">
+      <button class="main-btn" onclick="addTimeRow()">➕ Thêm khung giờ</button>
     </div>
 
     <div class="table-wrapper">
     <table>
       <thead>
         <tr>
-          <th>Buổi</th>
+          <th>⏰ Thời gian</th>
           <th>Thứ 2</th>
           <th>Thứ 3</th>
           <th>Thứ 4</th>
@@ -240,36 +246,21 @@
           <th>Chủ nhật</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="scheduleBody">
         <tr>
-          <th>Sáng</th>
-          <td id="Thứ 2-Sáng"></td>
-          <td id="Thứ 3-Sáng"></td>
-          <td id="Thứ 4-Sáng"></td>
-          <td id="Thứ 5-Sáng"></td>
-          <td id="Thứ 6-Sáng"></td>
-          <td id="Thứ 7-Sáng"></td>
-          <td id="Chủ nhật-Sáng"></td>
-        </tr>
-        <tr>
-          <th>Chiều</th>
-          <td id="Thứ 2-Chiều"></td>
-          <td id="Thứ 3-Chiều"></td>
-          <td id="Thứ 4-Chiều"></td>
-          <td id="Thứ 5-Chiều"></td>
-          <td id="Thứ 6-Chiều"></td>
-          <td id="Thứ 7-Chiều"></td>
-          <td id="Chủ nhật-Chiều"></td>
-        </tr>
-        <tr>
-          <th>Tối</th>
-          <td id="Thứ 2-Tối"></td>
-          <td id="Thứ 3-Tối"></td>
-          <td id="Thứ 4-Tối"></td>
-          <td id="Thứ 5-Tối"></td>
-          <td id="Thứ 6-Tối"></td>
-          <td id="Thứ 7-Tối"></td>
-          <td id="Chủ nhật-Tối"></td>
+          <th>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <span contenteditable="true" style="outline:none; width:100%;">19:00 - 21:00</span>
+              <button class="remove-row-btn">✖</button>
+            </div>
+          </th>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
         </tr>
       </tbody>
     </table>
@@ -277,37 +268,91 @@
   </div>
 
   <script>
-    function addSchedule() {
-      const name = document.getElementById('name').value.trim();
-      const day = document.getElementById('day').value;
-      const time = document.getElementById('time').value;
-      const topic = document.getElementById('topic').value.trim();
+    function setupCells() {
+      const cells = document.querySelectorAll('td');
 
-      if (!name || !topic) {
-        alert('Vui lòng nhập đầy đủ thông tin!');
-        return;
-      }
+      cells.forEach(cell => {
+        if (cell.dataset.active) return;
 
-      const cell = document.getElementById(`${day}-${time}`);
+        cell.dataset.active = 'true';
+        cell.style.cursor = 'pointer';
 
-      const lesson = document.createElement('div');
-      lesson.className = 'lesson';
+        cell.addEventListener('click', () => {
+          const existingLesson = cell.querySelector('.lesson');
 
-      lesson.innerHTML = `
-        <strong>👤 ${name}</strong>
-        <p>📚 ${topic}</p>
-        <button class="delete-btn">🗑 Xóa</button>
+          // Bấm lần 2 để xóa
+          if (existingLesson) {
+            existingLesson.remove();
+            return;
+          }
+
+          const name = document.getElementById('name').value.trim();
+
+          if (!name) {
+            alert('Vui lòng nhập tên trước!');
+            return;
+          }
+
+          const lesson = document.createElement('div');
+          lesson.className = 'lesson';
+
+          lesson.innerHTML = `
+            <strong>👤 ${name}</strong>
+          `;
+
+          cell.appendChild(lesson);
+        });
+      });
+    }
+
+    function addTimeRow() {
+      const tbody = document.getElementById('scheduleBody');
+
+      const row = document.createElement('tr');
+
+      row.innerHTML = `
+        <th>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <span contenteditable="true" style="outline:none; width:100%;">Nhập giờ học</span>
+            <button class="remove-row-btn">✖</button>
+          </div>
+        </th>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
       `;
 
-      lesson.querySelector('.delete-btn').onclick = () => {
-        lesson.remove();
-      };
-
-      cell.appendChild(lesson);
-
-      document.getElementById('name').value = '';
-      document.getElementById('topic').value = '';
+      tbody.appendChild(row);
+      setupCells();
+      setupRemoveButtons();
     }
+
+    function setupRemoveButtons() {
+      const buttons = document.querySelectorAll('.remove-row-btn');
+
+      buttons.forEach(button => {
+        if (button.dataset.active) return;
+
+        button.dataset.active = 'true';
+
+        button.onclick = (e) => {
+          e.stopPropagation();
+
+          const row = button.closest('tr');
+
+          if (confirm('Bạn có muốn xóa khung giờ này không?')) {
+            row.remove();
+          }
+        };
+      });
+    }
+
+    setupCells();
+    setupRemoveButtons();
   </script>
 </body>
 </html>
