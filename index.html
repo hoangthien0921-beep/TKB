@@ -15,23 +15,58 @@
 
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, #0f172a, #1e293b, #312e81);
+      background:
+        radial-gradient(circle at top left, rgba(139,92,246,0.25), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(59,130,246,0.22), transparent 35%),
+        linear-gradient(135deg, #020617, #0f172a, #1e1b4b);
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 30px;
       color: white;
+      overflow-x: auto;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      opacity: 0.35;
     }
 
     .container {
       width: 100%;
       max-width: 1200px;
       background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(18px);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       border-radius: 28px;
       border: 1px solid rgba(255,255,255,0.15);
       padding: 35px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+      box-shadow:
+        0 15px 40px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 0 35px rgba(99,102,241,0.18);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      background: rgba(139,92,246,0.18);
+      border-radius: 50%;
+      top: -120px;
+      right: -120px;
+      filter: blur(40px);
+      pointer-events: none;
     }
 
     h1 {
@@ -81,16 +116,36 @@
 
     .main-btn:hover {
       transform: scale(1.03);
+      box-shadow: 0 0 22px rgba(139,92,246,0.65);
     }
 
     .table-wrapper {
       overflow-x: auto;
+      border-radius: 22px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+
+    .table-wrapper::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.25);
+      border-radius: 999px;
     }
 
     table {
       width: 100%;
       min-width: 900px;
       border-collapse: collapse;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      backdrop-filter: blur(12px);
     }
 
     th {
@@ -188,6 +243,52 @@
         transform: translateY(0);
       }
     }
+  @media (max-width: 768px) {
+      body {
+        padding: 12px;
+        align-items: flex-start;
+      }
+
+      .container {
+        padding: 18px;
+        border-radius: 22px;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+
+      .subtitle {
+        font-size: 14px;
+      }
+
+      table {
+        min-width: 760px;
+      }
+
+      th,
+      td {
+        padding: 8px;
+        font-size: 13px;
+      }
+
+      td {
+        height: 110px;
+      }
+
+      .lesson {
+        font-size: 12px;
+        padding: 8px;
+      }
+
+      .main-btn {
+        width: 100%;
+      }
+
+      input {
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -195,7 +296,7 @@
     <h1>📘 Math Schedule</h1>
 
     <div class="subtitle">
-      Nhiều người có thể cùng đăng ký lịch học ✨
+      🚀 Realtime schedule • Nhiều người có thể cùng cập nhật lịch học
     </div>
 
     <input type="text" id="name" placeholder="Nhập tên của bạn" />
@@ -382,9 +483,42 @@
       });
     }
 
+    // ===== Realtime Sync =====
+    // Dùng BroadcastChannel để nhiều tab/người dùng trên cùng trình duyệt cập nhật realtime
+    // Nếu deploy online bạn có thể thay bằng Firebase/Supabase
+
+    const channel = new BroadcastChannel('math_schedule_channel');
+
     function saveLocal() {
-      localStorage.setItem('mathScheduleHTML', scheduleBody.innerHTML);
+      const html = scheduleBody.innerHTML;
+
+      localStorage.setItem('mathScheduleHTML', html);
+
+      channel.postMessage({
+        type: 'schedule-update',
+        html
+      });
     }
+
+    channel.onmessage = (event) => {
+      if (event.data.type === 'schedule-update') {
+        const currentHTML = scheduleBody.innerHTML;
+
+        // Tránh render lặp vô hạn
+        if (currentHTML !== event.data.html) {
+          scheduleBody.innerHTML = event.data.html;
+          restoreEvents();
+        }
+      }
+    };
+
+    // Đồng bộ giữa nhiều tab khi localStorage thay đổi
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'mathScheduleHTML') {
+        scheduleBody.innerHTML = event.newValue || '';
+        restoreEvents();
+      }
+    });
 
     function restoreEvents() {
       const rows = [...scheduleBody.querySelectorAll('tr')];
