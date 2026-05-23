@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thời Khóa Biểu Học Toán</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      text-align: center;
+      color: #4338ca;
+      margin-bottom: 25px;
+    }
+
+    .form-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    input, select, button {
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #3730a3;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 15px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 14px;
+      text-align: center;
+    }
+
+    th {
+      background: #4f46e5;
+      color: white;
+    }
+
+    td {
+      background: #f9fafb;
+      min-height: 70px;
+    }
+
+    .lesson {
+      background: #c7d2fe;
+      color: #1e1b4b;
+      padding: 8px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .delete-btn {
+      margin-top: 5px;
+      background: #ef4444;
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+
+    .delete-btn:hover {
+      background: #b91c1c;
+    }
+
+    @media (max-width: 768px) {
+      table {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📘 Thời Khóa Biểu Học Toán</h1>
+
+    <div class="form-box">
+      <input type="text" id="name" placeholder="Tên học sinh" />
+
+      <select id="day">
+        <option value="Thứ 2">Thứ 2</option>
+        <option value="Thứ 3">Thứ 3</option>
+        <option value="Thứ 4">Thứ 4</option>
+        <option value="Thứ 5">Thứ 5</option>
+        <option value="Thứ 6">Thứ 6</option>
+        <option value="Thứ 7">Thứ 7</option>
+        <option value="Chủ nhật">Chủ nhật</option>
+      </select>
+
+      <select id="time">
+        <option value="Sáng">Sáng</option>
+        <option value="Chiều">Chiều</option>
+        <option value="Tối">Tối</option>
+      </select>
+
+      <input type="text" id="topic" placeholder="Nội dung học Toán" />
+
+      <button onclick="addSchedule()">➕ Thêm lịch</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Buổi</th>
+          <th>Thứ 2</th>
+          <th>Thứ 3</th>
+          <th>Thứ 4</th>
+          <th>Thứ 5</th>
+          <th>Thứ 6</th>
+          <th>Thứ 7</th>
+          <th>Chủ nhật</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>Sáng</th>
+          <td id="Thứ 2-Sáng"></td>
+          <td id="Thứ 3-Sáng"></td>
+          <td id="Thứ 4-Sáng"></td>
+          <td id="Thứ 5-Sáng"></td>
+          <td id="Thứ 6-Sáng"></td>
+          <td id="Thứ 7-Sáng"></td>
+          <td id="Chủ nhật-Sáng"></td>
+        </tr>
+        <tr>
+          <th>Chiều</th>
+          <td id="Thứ 2-Chiều"></td>
+          <td id="Thứ 3-Chiều"></td>
+          <td id="Thứ 4-Chiều"></td>
+          <td id="Thứ 5-Chiều"></td>
+          <td id="Thứ 6-Chiều"></td>
+          <td id="Thứ 7-Chiều"></td>
+          <td id="Chủ nhật-Chiều"></td>
+        </tr>
+        <tr>
+          <th>Tối</th>
+          <td id="Thứ 2-Tối"></td>
+          <td id="Thứ 3-Tối"></td>
+          <td id="Thứ 4-Tối"></td>
+          <td id="Thứ 5-Tối"></td>
+          <td id="Thứ 6-Tối"></td>
+          <td id="Thứ 7-Tối"></td>
+          <td id="Chủ nhật-Tối"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    function addSchedule() {
+      const name = document.getElementById('name').value.trim();
+      const day = document.getElementById('day').value;
+      const time = document.getElementById('time').value;
+      const topic = document.getElementById('topic').value.trim();
+
+      if (!name || !topic) {
+        alert('Vui lòng nhập đầy đủ thông tin!');
+        return;
+      }
+
+      const cell = document.getElementById(`${day}-${time}`);
+
+      const lesson = document.createElement('div');
+      lesson.className = 'lesson';
+
+      lesson.innerHTML = `
+        <strong>${name}</strong><br>
+        ${topic}<br>
+        <button class="delete-btn">Xóa</button>
+      `;
+
+      lesson.querySelector('.delete-btn').onclick = () => {
+        lesson.remove();
+      };
+
+      cell.appendChild(lesson);
+
+      document.getElementById('name').value = '';
+      document.getElementById('topic').value = '';
+    }
+  </script>
+</body>
+</html>
