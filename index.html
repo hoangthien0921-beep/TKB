@@ -877,14 +877,18 @@ document
     element.style.boxShadow = 'none';
 
     const canvas =
-      await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: document.body.scrollWidth,
-        windowHeight: document.body.scrollHeight
-      });
+  await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+
+    backgroundColor: null,
+
+    scrollX: 0,
+    scrollY: 0,
+
+    windowWidth: document.body.scrollWidth,
+    windowHeight: document.body.scrollHeight
+  });
 
     const imgData =
       canvas.toDataURL('image/png');
@@ -902,14 +906,25 @@ document
         ]
       });
 
-    pdf.addImage(
-      imgData,
-      'PNG',
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
+    // nền tối
+pdf.setFillColor(15, 23, 42);
+
+pdf.rect(
+  0,
+  0,
+  canvas.width,
+  canvas.height,
+  'F'
+);
+
+pdf.addImage(
+  imgData,
+  'PNG',
+  0,
+  0,
+  canvas.width,
+  canvas.height
+);
 
     pdf.save('TKB-Toan.pdf');
 
