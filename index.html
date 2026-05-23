@@ -513,118 +513,122 @@
   measurementId: "G-T5BTL0HWHQ"
 };
 
-    let database = null;
+let database = null;
 let auth = null;
 
-    async function initFirebase() {
-      // Load Firebase động
-      const appScript = document.createElement('script');
-      appScript.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
-      document.head.appendChild(appScript);
+async function initFirebase() {
 
-      await new Promise(resolve => {
-        appScript.onload = resolve;
-      });
+  // FIREBASE APP
+  const appScript = document.createElement('script');
+  appScript.src =
+    'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
 
-const appScript = document.createElement('script');
-appScript.src =
-  'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
+  document.head.appendChild(appScript);
 
-document.head.appendChild(appScript);
+  await new Promise(resolve => {
+    appScript.onload = resolve;
+  });
 
-await new Promise(resolve => {
-  appScript.onload = resolve;
-});
+  // FIREBASE DATABASE
+  const dbScript = document.createElement('script');
+  dbScript.src =
+    'https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js';
 
-const dbScript = document.createElement('script');
-dbScript.src =
-  'https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js';
+  document.head.appendChild(dbScript);
 
-document.head.appendChild(dbScript);
+  await new Promise(resolve => {
+    dbScript.onload = resolve;
+  });
 
-await new Promise(resolve => {
-  dbScript.onload = resolve;
-});
+  // FIREBASE AUTH
+  const authScript = document.createElement('script');
+  authScript.src =
+    'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js';
 
-const authScript = document.createElement('script');
-authScript.src =
-  'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js';
+  document.head.appendChild(authScript);
 
-document.head.appendChild(authScript);
+  await new Promise(resolve => {
+    authScript.onload = resolve;
+  });
 
-await new Promise(resolve => {
-  authScript.onload = resolve;
-});
+  // KHỞI TẠO FIREBASE
+  firebase.initializeApp(firebaseConfig);
 
-      firebase.initializeApp(firebaseConfig);
-      database = firebase.database();
-      auth = firebase.auth();
+  database = firebase.database();
+  auth = firebase.auth();
 
-const provider = new firebase.auth.GoogleAuthProvider();
+  const provider =
+    new firebase.auth.GoogleAuthProvider();
 
-document.getElementById('loginBtn').onclick = async () => {
-  try {
-    await auth.signInWithPopup(provider);
-  } catch (err) {
-    console.error(err);
-    alert('Đăng nhập thất bại!');
-  }
-};
+  // LOGIN
+  document.getElementById('loginBtn').onclick =
+    async () => {
 
-auth.onAuthStateChanged(user => {
+      try {
+        await auth.signInWithPopup(provider);
+      } catch (err) {
+        console.error(err);
+        alert('Đăng nhập thất bại!');
+      }
+    };
 
-  if (!user) return;
+  // LOGOUT
+  document.getElementById('logoutBtn').onclick =
+    async () => {
 
-  // Tự điền tên
-  document.getElementById('name').value =
-    user.displayName;
+      await auth.signOut();
 
-  // Hiển thị user
-  document.getElementById('userBox').innerHTML = `
-    <div style="
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-bottom:20px;
-      background:rgba(255,255,255,0.08);
-      padding:10px 14px;
-      border-radius:14px;
-    ">
-      <img
-        src="${user.photoURL}"
-        width="42"
-        height="42"
-        style="
-          border-radius:50%;
-          border:2px solid white;
-        "
-      />
+      document.getElementById('userBox').innerHTML = '';
 
-      <div>
-        <div style="font-weight:bold">
-          ${user.displayName}
-        </div>
+      document.getElementById('name').value = '';
+    };
 
-        <div style="
-          font-size:12px;
-          opacity:0.7;
-        ">
-          ${user.email}
+  // HIỂN THỊ USER
+  auth.onAuthStateChanged(user => {
+
+    if (!user) return;
+
+    document.getElementById('name').value =
+      user.displayName;
+
+    document.getElementById('userBox').innerHTML = `
+      <div style="
+        display:flex;
+        align-items:center;
+        gap:10px;
+        margin-bottom:20px;
+        background:rgba(255,255,255,0.08);
+        padding:10px 14px;
+        border-radius:14px;
+      ">
+        <img
+          src="${user.photoURL}"
+          width="42"
+          height="42"
+          style="
+            border-radius:50%;
+            border:2px solid white;
+          "
+        />
+
+        <div>
+          <div style="font-weight:bold">
+            ${user.displayName}
+          </div>
+
+          <div style="
+            font-size:12px;
+            opacity:0.7;
+          ">
+            ${user.email}
+          </div>
         </div>
       </div>
-    </div>
-  `;
-});
-document.getElementById('logoutBtn').onclick = async () => {
+    `;
+  });
 
-  await auth.signOut();
-
-  document.getElementById('userBox').innerHTML = '';
-
-  document.getElementById('name').value = '';
-};
-      startRealtimeSync();
-    }
+  startRealtimeSync();
+}
 
     function saveLocal() {
       const html = scheduleBody.innerHTML;
