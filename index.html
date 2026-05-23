@@ -783,7 +783,7 @@ photo: item.dataset.photo
               lesson.className = 'lesson';
               lesson.dataset.name = user.name;
               lesson.dataset.photo =
-  auth.currentUser.photoURL ||
+  user.photo ||
   'https://cdn-icons-png.flaticon.com/512/149/149071.png';
               lesson.innerHTML = `
   <div style="
