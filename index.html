@@ -862,34 +862,53 @@ photo: item.dataset.photo
     console.assert(typeof updatePopularCells === 'function', 'updatePopularCells should exist');
     console.assert(document.getElementById('scheduleBody'), 'scheduleBody should exist');
     console.assert(Array.isArray(userColors), 'userColors should be array');
-    document
+document
   .getElementById('downloadPdfBtn')
-  .addEventListener('click', () => {
+  .addEventListener('click', async () => {
 
     const element =
       document.querySelector('.container');
 
-    html2pdf()
-      .set({
-        margin: 0.5,
-        filename: 'TKB-Toan.pdf',
-        image: {
-          type: 'jpeg',
-          quality: 1
-        },
-        html2canvas: {
-          scale: 2
-        },
-        jsPDF: {
-          unit: 'in',
-          format: 'a4',
-          orientation: 'landscape'
-        }
-      })
-      .from(element)
-      .save();
+    const canvas =
+      await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#0f172a"
+      });
+
+    const imgData =
+      canvas.toDataURL('image/png');
+
+    const { jsPDF } = window.jspdf;
+
+    const pdf =
+      new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: 'a4'
+      });
+
+    const pdfWidth =
+      pdf.internal.pageSize.getWidth();
+
+    const pdfHeight =
+      (canvas.height * pdfWidth) /
+      canvas.width;
+
+    pdf.addImage(
+      imgData,
+      'PNG',
+      0,
+      0,
+      pdfWidth,
+      pdfHeight
+    );
+
+    pdf.save('TKB-Toan.pdf');
 });
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>
