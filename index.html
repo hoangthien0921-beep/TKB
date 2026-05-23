@@ -483,42 +483,75 @@
       });
     }
 
-    // ===== Realtime Sync =====
-    // Dùng BroadcastChannel để nhiều tab/người dùng trên cùng trình duyệt cập nhật realtime
-    // Nếu deploy online bạn có thể thay bằng Firebase/Supabase
+    // ===== FIREBASE REALTIME DATABASE =====
+    // 1. Tạo Firebase project tại: https://console.firebase.google.com/
+    // 2. Bật Realtime Database
+    // 3. Thay thông tin bên dưới bằng config của bạn
 
-    const channel = new BroadcastChannel('math_schedule_channel');
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    let database = null;
+
+    async function initFirebase() {
+      // Load Firebase động
+      const appScript = document.createElement('script');
+      appScript.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
+      document.head.appendChild(appScript);
+
+      await new Promise(resolve => {
+        appScript.onload = resolve;
+      });
+
+      const dbScript = document.createElement('script');
+      dbScript.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js';
+      document.head.appendChild(dbScript);
+
+      await new Promise(resolve => {
+        dbScript.onload = resolve;
+      });
+
+      firebase.initializeApp(firebaseConfig);
+      database = firebase.database();
+
+      startRealtimeSync();
+    }
 
     function saveLocal() {
       const html = scheduleBody.innerHTML;
 
       localStorage.setItem('mathScheduleHTML', html);
 
-      channel.postMessage({
-        type: 'schedule-update',
-        html
-      });
+      // Sync realtime toàn bộ thiết bị
+      if (database) {
+        database.ref('mathSchedule').set({
+          html,
+          updatedAt: Date.now()
+        });
+      }
     }
 
-    channel.onmessage = (event) => {
-      if (event.data.type === 'schedule-update') {
-        const currentHTML = scheduleBody.innerHTML;
+    function startRealtimeSync() {
+      if (!database) return;
 
-        // Tránh render lặp vô hạn
-        if (currentHTML !== event.data.html) {
-          scheduleBody.innerHTML = event.data.html;
+      database.ref('mathSchedule').on('value', snapshot => {
+        const data = snapshot.val();
+
+        if (!data || !data.html) return;
+
+        if (scheduleBody.innerHTML !== data.html) {
+          scheduleBody.innerHTML = data.html;
           restoreEvents();
         }
-      }
-    };
-
-    // Đồng bộ giữa nhiều tab khi localStorage thay đổi
-    window.addEventListener('storage', (event) => {
-      if (event.key === 'mathScheduleHTML') {
-        scheduleBody.innerHTML = event.newValue || '';
-        restoreEvents();
-      }
-    });
+      });
+    }
 
     function restoreEvents() {
       const rows = [...scheduleBody.querySelectorAll('tr')];
@@ -632,6 +665,7 @@
     });
 
     loadLocal();
+    initFirebase();
 
     // Tests
     console.assert(typeof createRow === 'function', 'createRow should exist');
