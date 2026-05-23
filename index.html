@@ -282,7 +282,10 @@
 
         cell.dataset.ready = 'true';
 
-        cell.addEventListener('click', () => {
+        cell.addEventListener('click', (e) => {
+          // Không xử lý nếu bấm vào lesson con
+          if (e.target.closest('.lesson')) return;
+
           const name = document.getElementById('name').value.trim();
 
           if (!name) {
@@ -293,7 +296,7 @@
           const existing = [...cell.querySelectorAll('.lesson')]
             .find(item => item.dataset.name === name);
 
-          // Nếu tên đã tồn tại thì xóa
+          // Nếu tên đã tồn tại => bỏ chọn
           if (existing) {
             existing.remove();
             updatePopularCells();
@@ -301,6 +304,7 @@
             return;
           }
 
+          // Thêm tên mới
           const lesson = document.createElement('div');
           lesson.className = 'lesson';
           lesson.dataset.name = name;
@@ -309,6 +313,14 @@
           lesson.innerHTML = `
             <strong>👤 ${name}</strong>
           `;
+
+          // Cho phép bấm trực tiếp vào tên để bỏ chọn
+          lesson.addEventListener('click', (event) => {
+            event.stopPropagation();
+            lesson.remove();
+            updatePopularCells();
+            saveLocal();
+          });
 
           cell.appendChild(lesson);
 
@@ -326,7 +338,7 @@
 
         button.dataset.ready = 'true';
 
-        button.addEventListener('click', (e) => {
+        button.onclick = (e) => {
           e.stopPropagation();
 
           const row = button.closest('tr');
