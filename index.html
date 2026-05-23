@@ -526,13 +526,35 @@ let auth = null;
         appScript.onload = resolve;
       });
 
-      const dbScript = document.createElement('script');
-      dbScript.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js';
-      document.head.appendChild(dbScript);
+const appScript = document.createElement('script');
+appScript.src =
+  'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
 
-      await new Promise(resolve => {
-        dbScript.onload = resolve;
-      });
+document.head.appendChild(appScript);
+
+await new Promise(resolve => {
+  appScript.onload = resolve;
+});
+
+const dbScript = document.createElement('script');
+dbScript.src =
+  'https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js';
+
+document.head.appendChild(dbScript);
+
+await new Promise(resolve => {
+  dbScript.onload = resolve;
+});
+
+const authScript = document.createElement('script');
+authScript.src =
+  'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js';
+
+document.head.appendChild(authScript);
+
+await new Promise(resolve => {
+  authScript.onload = resolve;
+});
 
       firebase.initializeApp(firebaseConfig);
       database = firebase.database();
@@ -754,6 +776,5 @@ document.getElementById('logoutBtn').onclick = async () => {
     console.assert(document.getElementById('scheduleBody'), 'scheduleBody should exist');
     console.assert(Array.isArray(userColors), 'userColors should be array');
   </script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 </body>
 </html>
