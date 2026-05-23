@@ -102,6 +102,7 @@
     td {
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.08);
+      min-height: 120px;
       height: 120px;
       padding: 10px;
       vertical-align: top;
@@ -123,6 +124,7 @@
       box-shadow: 0 6px 15px rgba(0,0,0,0.25);
       color: white;
       font-weight: 600;
+      margin-bottom: 8px;
     }
 
     .lesson:hover {
@@ -144,6 +146,9 @@
       background: rgba(239,68,68,0.9);
       color: white;
       font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .remove-row-btn:hover {
@@ -196,7 +201,7 @@
     <input type="text" id="name" placeholder="Nhập tên của bạn" />
 
     <div class="top-bar">
-      <button class="main-btn" onclick="addTimeRow()">
+      <button class="main-btn" id="addRowBtn">
         ➕ Thêm khung giờ
       </button>
     </div>
@@ -224,36 +229,6 @@
   <script>
     const scheduleBody = document.getElementById('scheduleBody');
 
-    function createRow(time = '19:00 - 21:00') {
-      const row = document.createElement('tr');
-
-      row.innerHTML = `
-        <th>
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-            <span contenteditable="true" style="outline:none; width:100%; text-align:left;">
-              ${time}
-            </span>
-            <button class="remove-row-btn">✖</button>
-          </div>
-        </th>
-
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      `;
-
-      scheduleBody.appendChild(row);
-
-      setupCells();
-      setupRemoveButtons();
-      updatePopularCells();
-      saveLocal();
-    }
-
     const userColors = [
       'linear-gradient(135deg,#ec4899,#be185d)',
       'linear-gradient(135deg,#8b5cf6,#6366f1)',
@@ -274,82 +249,107 @@
       return userColors[total % userColors.length];
     }
 
-    function setupCells() {
-      const cells = document.querySelectorAll('td');
+    function createCell() {
+      const td = document.createElement('td');
 
-      cells.forEach(cell => {
-        if (cell.dataset.ready) return;
+      td.addEventListener('click', () => {
+        const nameInput = document.getElementById('name');
+        const name = nameInput.value.trim();
 
-        cell.dataset.ready = 'true';
+        if (!name) {
+          alert('Vui lòng nhập tên trước!');
+          return;
+        }
 
-        cell.addEventListener('click', (e) => {
-          // Không xử lý nếu bấm vào lesson con
-          if (e.target.closest('.lesson')) return;
+        const existing = [...td.querySelectorAll('.lesson')]
+          .find(item => item.dataset.name === name);
 
-          const name = document.getElementById('name').value.trim();
+        if (existing) {
+          existing.remove();
+          updatePopularCells();
+          saveLocal();
+          return;
+        }
 
-          if (!name) {
-            alert('Vui lòng nhập tên trước!');
+        const lesson = document.createElement('div');
+        lesson.className = 'lesson';
+        lesson.dataset.name = name;
+        lesson.style.background = getColorFromName(name);
+        lesson.innerHTML = `<strong>👤 ${name}</strong>`;
+
+        lesson.addEventListener('click', (event) => {
+          event.stopPropagation();
+
+          const currentName = document
+            .getElementById('name')
+            .value
+            .trim();
+
+          // Chỉ cho phép chính chủ xóa lịch của mình
+          if (currentName !== lesson.dataset.name) {
+            alert('Bạn chỉ có thể xóa lịch của chính mình!');
             return;
           }
 
-          const existing = [...cell.querySelectorAll('.lesson')]
-            .find(item => item.dataset.name === name);
-
-          // Nếu tên đã tồn tại => bỏ chọn
-          if (existing) {
-            existing.remove();
-            updatePopularCells();
-            saveLocal();
-            return;
-          }
-
-          // Thêm tên mới
-          const lesson = document.createElement('div');
-          lesson.className = 'lesson';
-          lesson.dataset.name = name;
-          lesson.style.background = getColorFromName(name);
-
-          lesson.innerHTML = `
-            <strong>👤 ${name}</strong>
-          `;
-
-          // Cho phép bấm trực tiếp vào tên để bỏ chọn
-          lesson.addEventListener('click', (event) => {
-            event.stopPropagation();
-            lesson.remove();
-            updatePopularCells();
-            saveLocal();
-          });
-
-          cell.appendChild(lesson);
-
+          lesson.remove();
           updatePopularCells();
           saveLocal();
         });
+
+        td.appendChild(lesson);
+
+        updatePopularCells();
+        saveLocal();
       });
+
+      return td;
     }
 
-    function setupRemoveButtons() {
-      const buttons = document.querySelectorAll('.remove-row-btn');
+    function createRow(time = '19:00 - 21:00') {
+      const row = document.createElement('tr');
 
-      buttons.forEach(button => {
-        if (button.dataset.ready) return;
+      const th = document.createElement('th');
 
-        button.dataset.ready = 'true';
+      const wrapper = document.createElement('div');
+      wrapper.style.display = 'flex';
+      wrapper.style.alignItems = 'center';
+      wrapper.style.justifyContent = 'space-between';
+      wrapper.style.gap = '10px';
 
-        button.onclick = (e) => {
-          e.stopPropagation();
+      const span = document.createElement('span');
+      span.contentEditable = 'true';
+      span.style.outline = 'none';
+      span.style.width = '100%';
+      span.style.textAlign = 'left';
+      span.textContent = time;
 
-          const row = button.closest('tr');
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'remove-row-btn';
+      removeBtn.textContent = '✖';
 
-          if (confirm('Bạn có muốn xóa khung giờ này không?')) {
-            row.remove();
-            updatePopularCells();
-            saveLocal();
-          }
-        });
+      removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        if (confirm('Bạn có muốn xóa khung giờ này không?')) {
+          row.remove();
+          updatePopularCells();
+          saveLocal();
+        }
       });
+
+      wrapper.appendChild(span);
+      wrapper.appendChild(removeBtn);
+      th.appendChild(wrapper);
+      row.appendChild(th);
+
+      for (let i = 0; i < 7; i++) {
+        row.appendChild(createCell());
+      }
+
+      scheduleBody.appendChild(row);
+
+      updatePopularCells();
+      saveLocal();
     }
 
     function updatePopularCells() {
@@ -382,36 +382,129 @@
       });
     }
 
-    function addTimeRow() {
-      createRow('Nhập giờ học');
+    function saveLocal() {
+      localStorage.setItem('mathScheduleHTML', scheduleBody.innerHTML);
     }
 
-    // Lưu local
-    function saveLocal() {
-      localStorage.setItem('mathSchedule', scheduleBody.innerHTML);
+    function restoreEvents() {
+      const rows = [...scheduleBody.querySelectorAll('tr')];
+      const oldRows = rows.map(row => {
+        const time = row.querySelector('span')?.textContent || 'Khung giờ';
+
+        const lessons = [...row.querySelectorAll('td')].map(cell => {
+          return [...cell.querySelectorAll('.lesson')].map(item => ({
+            name: item.dataset.name
+          }));
+        });
+
+        return { time, lessons };
+      });
+
+      scheduleBody.innerHTML = '';
+
+      oldRows.forEach(data => {
+        const row = document.createElement('tr');
+
+        const th = document.createElement('th');
+
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.alignItems = 'center';
+        wrapper.style.justifyContent = 'space-between';
+        wrapper.style.gap = '10px';
+
+        const span = document.createElement('span');
+        span.contentEditable = 'true';
+        span.style.outline = 'none';
+        span.style.width = '100%';
+        span.style.textAlign = 'left';
+        span.textContent = data.time;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-row-btn';
+        removeBtn.textContent = '✖';
+
+        removeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+
+          if (confirm('Bạn có muốn xóa khung giờ này không?')) {
+            row.remove();
+            updatePopularCells();
+            saveLocal();
+          }
+        });
+
+        wrapper.appendChild(span);
+        wrapper.appendChild(removeBtn);
+        th.appendChild(wrapper);
+        row.appendChild(th);
+
+        for (let i = 0; i < 7; i++) {
+          const cell = createCell();
+
+          if (data.lessons[i]) {
+            data.lessons[i].forEach(user => {
+              const lesson = document.createElement('div');
+              lesson.className = 'lesson';
+              lesson.dataset.name = user.name;
+              lesson.style.background = getColorFromName(user.name);
+              lesson.innerHTML = `<strong>👤 ${user.name}</strong>`;
+
+              lesson.addEventListener('click', (event) => {
+          event.stopPropagation();
+
+          const currentName = document
+            .getElementById('name')
+            .value
+            .trim();
+
+          // Chỉ cho phép chính chủ xóa lịch của mình
+          if (currentName !== lesson.dataset.name) {
+            alert('Bạn chỉ có thể xóa lịch của chính mình!');
+            return;
+          }
+
+          lesson.remove();
+          updatePopularCells();
+          saveLocal();
+        });
+
+              cell.appendChild(lesson);
+            });
+          }
+
+          row.appendChild(cell);
+        }
+
+        scheduleBody.appendChild(row);
+      });
+
+      updatePopularCells();
     }
 
     function loadLocal() {
-      const saved = localStorage.getItem('mathSchedule');
+      const saved = localStorage.getItem('mathScheduleHTML');
 
       if (saved) {
         scheduleBody.innerHTML = saved;
+        restoreEvents();
       } else {
         createRow();
       }
-
-      setupCells();
-      setupRemoveButtons();
-      updatePopularCells();
     }
+
+    document.getElementById('addRowBtn').addEventListener('click', () => {
+      createRow('Nhập giờ học');
+    });
 
     loadLocal();
 
     // Tests
     console.assert(typeof createRow === 'function', 'createRow should exist');
-    console.assert(typeof setupCells === 'function', 'setupCells should exist');
+    console.assert(typeof createCell === 'function', 'createCell should exist');
     console.assert(typeof updatePopularCells === 'function', 'updatePopularCells should exist');
     console.assert(document.getElementById('scheduleBody'), 'scheduleBody should exist');
+    console.assert(Array.isArray(userColors), 'userColors should be array');
   </script>
 </body>
 </html>
